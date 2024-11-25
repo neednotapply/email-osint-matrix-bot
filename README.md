@@ -1,6 +1,6 @@
-# Email OSINT Discord Bot
+# Email OSINT Matrix Bot
 
-A comprehensive Discord bot that allows you to check emails for associated social media accounts, data breaches, pastes, and more!
+A comprehensive Matrix bot that allows you to check emails for associated social media accounts, data breaches, pastes, and more!
 
 ## Features
 
@@ -14,21 +14,21 @@ A comprehensive Discord bot that allows you to check emails for associated socia
 ### Prerequisites
 
 - Python 3.6 or higher
-- A valid Discord bot token
+- A valid Matrix bot token
 - HaveIBeenPwned API key for data breach and pastes checks
 
 ### Steps
 
 1. **Clone the repository**:
    ```
-   git clone https://github.com/RocketGod-git/email-osint-discord-bot.git
-   cd email-osint-discord-bot
+   git clone https://github.com/neednotapply/email-osint-matrix-bot.git
+   cd email-osint-matrix-bot
    ```
 
 2. **Setup Configuration**:
    - Edit `config.json`.
    - Fill in the required fields:
-     - `discord_bot_token`: Your Discord bot token.
+     - `matrix_bot_token`: Your Matrix bot token.
      - `hibp_api_key`: Your HaveIBeenPwned API key.
 
 3. **Run the bot**:
@@ -67,6 +67,6 @@ Feel free to fork the repository and submit pull requests. All contributions are
 
 ## License
 
-This project is licensed under the [AGPL-3.0 license](https://github.com/RocketGod-git/email-osint-discord-bot/blob/main/LICENSE).
+This project is licensed under the [AGPL-3.0 license](https://github.com/RocketGod-git/email-osint-Matrix-bot/blob/main/LICENSE).
 
 ![rocketgod_logo](https://github.com/RocketGod-git/shodanbot/assets/57732082/7929b554-0fba-4c2b-b22d-6772d23c4a18)
