@@ -1,4 +1,6 @@
 {
-    "discord_bot_token": "YOUR-TOKEN-HERE",
-    "hibp_api_key": "YOUR-KEY-HERE"
+    "homeserver_url": "https://matrix.org",
+    "matrix_username": "@yourbot:matrix.org",
+    "matrix_password": "your_password",
+    "hibp_api_key": "your_hibp_api_key"
 }
