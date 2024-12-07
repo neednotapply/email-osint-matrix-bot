@@ -1,67 +1,66 @@
 import subprocess
 import logging
 
+logging.basicConfig(level=logging.INFO)
 
-async def check_email(email):
+def parse_holehe_output(output: str) -> str:
     """
-    Check the given email using the Holehe CLI tool.
-
-    Args:
-        email (str): The email address to check.
-
-    Returns:
-        str: The parsed results from Holehe or an error message.
+    Parse the output of Holehe to extract relevant results.
     """
-    logging.info(f"Running Holehe CLI for email: {email}")
-    
+    lines = output.splitlines()
+    results = []
+    additional_info = []
+
+    for line in lines:
+        # Stop parsing if "Email used" legend is encountered
+        if line.strip().startswith("[+] Email used"):
+            break
+
+        # Match lines with "[+]" indicating a positive result
+        if line.startswith("[+]"):
+            parts = line.split(" ", 1)
+            if len(parts) == 2:
+                site = parts[1].strip()
+                # Extract additional info (if available)
+                if "/" in site:
+                    site, *info = site.split(" / ")
+                    additional_info.append(f'<a href="{info[-1].strip()}" target="_blank">{info[-1].strip()}</a>')
+                # Create formatted result
+                url = f"https://{site}"
+                results.append(f'<li><a href="{url}" target="_blank">{site.capitalize()}</a></li>')
+
+    # Format results and additional info
+    result_message = (
+        "<h3>Email registered at the following sites:</h3>"
+        f"<ul>{''.join(results)}</ul>"
+    )
+    if additional_info:
+        result_message += (
+            "<br><b>Additional Information:</b><br>"
+            f"<ul>{''.join(f'<li>{info}</li>' for info in additional_info)}</ul>"
+        )
+
+    return result_message if results else "No results found for the email."
+
+async def check_email(email: str) -> str:
+    """
+    Run the Holehe CLI tool for the given email and parse the output.
+    """
     try:
-        # Run the Holehe CLI command
+        logging.info(f"Running Holehe CLI for email: {email}")
         process = subprocess.run(
             ["holehe", email],
             capture_output=True,
-            text=True
+            text=True,
+            check=True
         )
-        
-        stdout = process.stdout.strip()
-        stderr = process.stderr.strip()
-
-        # Log stderr if it contains any output
-        if stderr:
-            logging.warning(f"Holehe CLI stderr: {stderr}")
-
-        # If stdout is empty, log and return an error
-        if not stdout:
-            logging.error(f"Holehe CLI returned no output for {email}.")
-            return "No results found for the email."
-
-        # Refined parsing logic
-        results_lines = []
-        is_relevant_section = False
-
-        for line in stdout.splitlines():
-            # Skip progress bar
-            if "100%|##########|" in line:
-                continue
-
-            # Detect the start of the results section
-            if line.startswith("*******************"):
-                is_relevant_section = True
-                continue
-
-            # Collect relevant lines in the results section
-            if is_relevant_section:
-                if line.strip().startswith("[+]"):  # Only include relevant positive results
-                    results_lines.append(line.strip())
-
-        # Combine and format results
-        if results_lines:
-            results = "\n".join(results_lines)
-            logging.debug(f"Parsed results for {email}:\n{results}")
-            return results
-        else:
-            logging.info(f"No relevant data found for {email}.")
-            return "No results found for the email."
-
+        # Get only stdout (strip progress bar updates from stderr if needed)
+        raw_output = process.stdout
+        logging.info(f"Raw output:\n{raw_output}")
+        return parse_holehe_output(raw_output)
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Holehe error: {e.stderr}")
+        return "An error occurred while checking the email."
     except Exception as e:
-        logging.error(f"Error while running Holehe: {e}")
-        return "An error occurred while checking the email. Please try again later."
+        logging.error(f"Unexpected error in check_email: {e}")
+        return "An unexpected error occurred."
