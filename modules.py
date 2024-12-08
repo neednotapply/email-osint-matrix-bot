@@ -24,23 +24,24 @@ def parse_holehe_output(output: str) -> str:
                 # Extract additional info (if available)
                 if "/" in site:
                     site, *info = site.split(" / ")
-                    additional_info.append(f'<a href="{info[-1].strip()}" target="_blank">{info[-1].strip()}</a>')
-                # Create formatted result
-                url = f"https://{site}"
-                results.append(f'<li><a href="{url}" target="_blank">{site.capitalize()}</a></li>')
+                    title = info[0].strip()  # Extract the title (e.g., "FullName")
+                    link = info[-1].strip()  # Extract the link
+                    additional_info.append(f'<li><b>{title}:</b> <a href="{link}" target="_blank">{link}</a></li>')
+                else:
+                    url = f"https://{site}"
+                    results.append(f'<li><a href="{url}" target="_blank">{site.capitalize()}</a></li>')
 
-    # Format results and additional info
-    result_message = (
-        "<h3>Email registered at the following sites:</h3>"
-        f"<ul>{''.join(results)}</ul>"
+    # Format additional information and main results
+    additional_info_section = (
+        "<h3>Information:</h3>"
+        f"<ul>{''.join(additional_info)}</ul>" if additional_info else ""
     )
-    if additional_info:
-        result_message += (
-            "<br><b>Additional Information:</b><br>"
-            f"<ul>{''.join(f'<li>{info}</li>' for info in additional_info)}</ul>"
-        )
+    main_results_section = (
+        "<h3>Email registered at the following sites:</h3>"
+        f"<ul>{''.join(results)}</ul>" if results else "No results found for the email."
+    )
 
-    return result_message if results else "No results found for the email."
+    return f"{additional_info_section}<br>{main_results_section}"
 
 async def check_email(email: str) -> str:
     """
